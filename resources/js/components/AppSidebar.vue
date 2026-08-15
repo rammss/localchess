@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid } from '@lucide/vue';
+import {
+    BarChart3,
+    BookOpen,
+    FolderGit2,
+    LayoutGrid,
+    Swords,
+    Trophy,
+    Users,
+} from '@lucide/vue';
 import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
@@ -17,6 +25,10 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import * as competitionRoutes from '@/routes/competitions';
+import * as playerRoutes from '@/routes/players';
+import * as rankingRoutes from '@/routes/rankings';
+import * as tournamentRoutes from '@/routes/tournaments';
 import type { NavItem } from '@/types';
 
 const page = usePage();
@@ -25,13 +37,44 @@ const dashboardUrl = computed(() =>
     page.props.currentTeam ? dashboard(page.props.currentTeam.slug).url : '/',
 );
 
-const mainNavItems = computed<NavItem[]>(() => [
-    {
-        title: 'Dashboard',
-        href: dashboardUrl.value,
-        icon: LayoutGrid,
-    },
-]);
+const mainNavItems = computed<NavItem[]>(() => {
+    const items: NavItem[] = [
+        {
+            title: 'Dashboard',
+            href: dashboardUrl.value,
+            icon: LayoutGrid,
+        },
+    ];
+
+    if (page.props.currentTeam) {
+        const slug = page.props.currentTeam.slug;
+
+        items.push(
+            {
+                title: 'Jugadores',
+                href: playerRoutes.index.url(slug),
+                icon: Users,
+            },
+            {
+                title: 'Torneos',
+                href: tournamentRoutes.index.url(slug),
+                icon: Trophy,
+            },
+            {
+                title: 'Competencias',
+                href: competitionRoutes.index.url(slug),
+                icon: Swords,
+            },
+            {
+                title: 'Rankings',
+                href: rankingRoutes.index.url(slug),
+                icon: BarChart3,
+            },
+        );
+    }
+
+    return items;
+});
 
 const footerNavItems: NavItem[] = [
     {

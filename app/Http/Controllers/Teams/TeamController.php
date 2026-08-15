@@ -56,6 +56,14 @@ class TeamController extends Controller
                 'name' => $team->name,
                 'slug' => $team->slug,
                 'isPersonal' => $team->is_personal,
+                'acronym' => $team->acronym,
+                'city' => $team->city,
+                'state' => $team->state,
+                'country' => $team->country,
+                'address' => $team->address,
+                'website' => $team->website,
+                'email' => $team->email,
+                'phone' => $team->phone,
             ],
             'members' => $team->members()->get()->map(function (User $member) {
                 /** @var Membership $membership */
@@ -95,7 +103,7 @@ class TeamController extends Controller
         $team = DB::transaction(function () use ($request, $team) {
             $team = Team::whereKey($team->id)->lockForUpdate()->firstOrFail();
 
-            $team->update(['name' => $request->validated('name')]);
+            $team->update($request->validated());
 
             return $team;
         });

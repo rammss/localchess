@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PerformanceVariation;
+use App\Models\PlayerRanking;
+use App\Models\Team;
 use App\Models\TeamInvitation;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -9,7 +12,7 @@ use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function __invoke(Request $request): Response
+    public function __invoke(Request $request, Team $current_team): Response
     {
         $email = strtolower($request->user()->email);
 
@@ -33,6 +36,43 @@ class DashboardController extends Controller
 
         return Inertia::render('Dashboard', [
             'pendingInvitations' => $pendingInvitations,
+            'stats' => $current_team->is_personal ? null : $this->stats($current_team),
         ]);
+    }
+
+    private function stats(Team $team): array
+    {
+        $rankingIds = $team->ownedRankings()->pluck('id');
+
+        $now = now();
+
+        return [
+            'rankingsCount' => $rankingIds->count(),
+            'playersCount' => PlayerRanking::whereIn('ranking_id', $rankingIds)->distinct('player_id')->count('player_id'),
+            'tournamentsThisMonth' => $team->tournaments()
+                ->whereBetween('begins', [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()])
+                ->count(),
+            'upcomingTournaments' => $team->tournaments()
+                ->where('begins', '>=', $now->toDateString())
+                ->orderBy('begins')
+                ->limit(5)
+                ->get(['id', 'name', 'place', 'begins']),
+            'topGainers' => PerformanceVariation::query()
+                ->whereHas('playerRanking', fn ($query) => $query->whereIn('ranking_id', $rankingIds))
+                ->where('created_at', '>=', $now->copy()->subDays(30))
+                ->where('variation', '>', 0)
+                ->with('player:id,name,last_name')
+                ->orderByDesc('variation')
+                ->limit(5)
+                ->get(['id', 'player_id', 'variation', 'created_at']),
+            'topLosers' => PerformanceVariation::query()
+                ->whereHas('playerRanking', fn ($query) => $query->whereIn('ranking_id', $rankingIds))
+                ->where('created_at', '>=', $now->copy()->subDays(30))
+                ->where('variation', '<', 0)
+                ->with('player:id,name,last_name')
+                ->orderBy('variation')
+                ->limit(5)
+                ->get(['id', 'player_id', 'variation', 'created_at']),
+        ];
     }
 }

@@ -8,6 +8,14 @@ export type Team = {
     role?: TeamRole;
     roleLabel?: string;
     isCurrent?: boolean;
+    acronym?: string | null;
+    city?: string | null;
+    state?: string | null;
+    country?: string | null;
+    address?: string | null;
+    website?: string | null;
+    email?: string | null;
+    phone?: string | null;
 };
 
 export type TeamMember = {

@@ -100,12 +100,12 @@ const confirmCancelInvitation = (invitation: TeamInvitation) => {
     <h1 class="sr-only">{{ pageTitle }}</h1>
 
     <div class="flex flex-col space-y-10">
-        <!-- Team Name Section -->
+        <!-- Federation data section -->
         <div v-if="permissions.canUpdateTeam" class="space-y-6">
             <Heading
                 variant="small"
-                title="Team settings"
-                description="Update your team name and settings"
+                title="Datos de la federación"
+                description="Nombre, ubicación y datos de contacto"
             />
 
             <Form
@@ -113,16 +113,100 @@ const confirmCancelInvitation = (invitation: TeamInvitation) => {
                 class="space-y-6"
                 v-slot="{ errors, processing }"
             >
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="grid gap-2">
+                        <Label for="name">Nombre</Label>
+                        <Input
+                            id="name"
+                            name="name"
+                            data-test="team-name-input"
+                            :default-value="team.name"
+                            required
+                        />
+                        <InputError :message="errors.name" />
+                    </div>
+                    <div class="grid gap-2">
+                        <Label for="acronym">Sigla</Label>
+                        <Input
+                            id="acronym"
+                            name="acronym"
+                            :default-value="team.acronym ?? ''"
+                        />
+                        <InputError :message="errors.acronym" />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="grid gap-2">
+                        <Label for="city">Ciudad</Label>
+                        <Input
+                            id="city"
+                            name="city"
+                            :default-value="team.city ?? ''"
+                        />
+                        <InputError :message="errors.city" />
+                    </div>
+                    <div class="grid gap-2">
+                        <Label for="state">Provincia</Label>
+                        <Input
+                            id="state"
+                            name="state"
+                            :default-value="team.state ?? ''"
+                        />
+                        <InputError :message="errors.state" />
+                    </div>
+                    <div class="grid gap-2">
+                        <Label for="country">País</Label>
+                        <Input
+                            id="country"
+                            name="country"
+                            :default-value="team.country ?? ''"
+                        />
+                        <InputError :message="errors.country" />
+                    </div>
+                </div>
+
                 <div class="grid gap-2">
-                    <Label for="name">Team name</Label>
+                    <Label for="address">Dirección</Label>
                     <Input
-                        id="name"
-                        name="name"
-                        data-test="team-name-input"
-                        :default-value="team.name"
-                        required
+                        id="address"
+                        name="address"
+                        :default-value="team.address ?? ''"
                     />
-                    <InputError :message="errors.name" />
+                    <InputError :message="errors.address" />
+                </div>
+
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="grid gap-2">
+                        <Label for="website">Sitio web</Label>
+                        <Input
+                            id="website"
+                            name="website"
+                            type="url"
+                            placeholder="https://…"
+                            :default-value="team.website ?? ''"
+                        />
+                        <InputError :message="errors.website" />
+                    </div>
+                    <div class="grid gap-2">
+                        <Label for="email">Email</Label>
+                        <Input
+                            id="email"
+                            name="email"
+                            type="email"
+                            :default-value="team.email ?? ''"
+                        />
+                        <InputError :message="errors.email" />
+                    </div>
+                    <div class="grid gap-2">
+                        <Label for="phone">Teléfono</Label>
+                        <Input
+                            id="phone"
+                            name="phone"
+                            :default-value="team.phone ?? ''"
+                        />
+                        <InputError :message="errors.phone" />
+                    </div>
                 </div>
 
                 <div class="flex items-center gap-4">
@@ -131,7 +215,7 @@ const confirmCancelInvitation = (invitation: TeamInvitation) => {
                         data-test="team-save-button"
                         :disabled="processing"
                     >
-                        Save
+                        Guardar
                     </Button>
                 </div>
             </Form>
